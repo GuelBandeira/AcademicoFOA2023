@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Academico.Data;
 using Academico.Models;
 
-namespace Academico.Controllers
+namespace Academico.Views
 {
     public class AlunoDisciplinaController : Controller
     {
@@ -22,9 +22,8 @@ namespace Academico.Controllers
         // GET: AlunoDisciplina
         public async Task<IActionResult> Index()
         {
-              return _context.AlunoDisciplina != null ? 
-                          View(await _context.AlunoDisciplina.ToListAsync()) :
-                          Problem("Entity set 'AcademicoContext.AlunoDisciplina'  is null.");
+            var academicoContext = _context.AlunoDisciplina.Include(a => a.Aluno).Include(a => a.Disciplina);
+            return View(await academicoContext.ToListAsync());
         }
 
         // GET: AlunoDisciplina/Details/5
@@ -36,6 +35,8 @@ namespace Academico.Controllers
             }
 
             var alunoDisciplina = await _context.AlunoDisciplina
+                .Include(a => a.Aluno)
+                .Include(a => a.Disciplina)
                 .FirstOrDefaultAsync(m => m.AlunoId == id);
             if (alunoDisciplina == null)
             {
@@ -48,6 +49,8 @@ namespace Academico.Controllers
         // GET: AlunoDisciplina/Create
         public IActionResult Create()
         {
+            ViewData["AlunoId"] = new SelectList(_context.Aluno, "Id", "Id");
+            ViewData["DisciplinaId"] = new SelectList(_context.Disciplinas, "Id", "Id");
             return View();
         }
 
@@ -64,22 +67,26 @@ namespace Academico.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["AlunoId"] = new SelectList(_context.Aluno, "Id", "Id", alunoDisciplina.AlunoId);
+            ViewData["DisciplinaId"] = new SelectList(_context.Disciplinas, "Id", "Id", alunoDisciplina.DisciplinaId);
             return View(alunoDisciplina);
         }
 
         // GET: AlunoDisciplina/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? AlunoId, int? DisciplinaId,AlunoDisciplina alunoDisci)
         {
-            if (id == null || _context.AlunoDisciplina == null)
+            if (_context.AlunoDisciplina == null)
             {
                 return NotFound();
             }
 
-            var alunoDisciplina = await _context.AlunoDisciplina.FindAsync(id);
+            var alunoDisciplina = await _context.AlunoDisciplina.FindAsync(alunoDisci);
             if (alunoDisciplina == null)
             {
                 return NotFound();
             }
+            ViewData["AlunoId"] = new SelectList(_context.Aluno, "Id", "Id", alunoDisciplina.AlunoId);
+            ViewData["DisciplinaId"] = new SelectList(_context.Disciplinas, "Id", "Id", alunoDisciplina.DisciplinaId);
             return View(alunoDisciplina);
         }
 
@@ -115,6 +122,8 @@ namespace Academico.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
+            ViewData["AlunoId"] = new SelectList(_context.Aluno, "Id", "Id", alunoDisciplina.AlunoId);
+            ViewData["DisciplinaId"] = new SelectList(_context.Disciplinas, "Id", "Id", alunoDisciplina.DisciplinaId);
             return View(alunoDisciplina);
         }
 
@@ -127,6 +136,8 @@ namespace Academico.Controllers
             }
 
             var alunoDisciplina = await _context.AlunoDisciplina
+                .Include(a => a.Aluno)
+                .Include(a => a.Disciplina)
                 .FirstOrDefaultAsync(m => m.AlunoId == id);
             if (alunoDisciplina == null)
             {
@@ -150,14 +161,14 @@ namespace Academico.Controllers
             {
                 _context.AlunoDisciplina.Remove(alunoDisciplina);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool AlunoDisciplinaExists(int? id)
         {
-          return (_context.AlunoDisciplina?.Any(e => e.AlunoId == id)).GetValueOrDefault();
+            return (_context.AlunoDisciplina?.Any(e => e.AlunoId == id)).GetValueOrDefault();
         }
     }
 }

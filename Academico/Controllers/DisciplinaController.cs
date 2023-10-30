@@ -35,8 +35,9 @@ namespace Academico.Controllers
                 return NotFound();
             }
 
-            var disciplina = await _context.Disciplinas
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var disciplina = await _context.Disciplinas.Include(d => d.CursosDisciplinas).SingleOrDefaultAsync(i => i.Id == id);
+
+
             if (disciplina == null)
             {
                 return NotFound();

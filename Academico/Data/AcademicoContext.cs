@@ -13,7 +13,8 @@ namespace Academico.Data
         public DbSet<Aluno> Aluno { get; set; }
         public DbSet<Disciplina> Disciplinas { get; set; }
         public DbSet<CursoDisciplina> CursosDisciplina { get; set; }
-   
+        public DbSet<Academico.Models.AlunoDisciplina>? AlunoDisciplina { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -26,7 +27,6 @@ namespace Academico.Data
         }
    
 
-        public DbSet<Academico.Models.AlunoDisciplina>? AlunoDisciplina { get; set; }
 
 
     }
